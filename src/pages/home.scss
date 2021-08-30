@@ -1,0 +1,15 @@
+
+.home-container {
+    width: 100%;
+
+    .list-title {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .list-loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
