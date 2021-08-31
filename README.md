@@ -54,8 +54,6 @@ Localstorage is used for data persistence
 ### Todo
 
 - Login page + login/registration/validation
-- 404 page
-- Sorting of lists
 - Add favorites
 
 ### Testing
