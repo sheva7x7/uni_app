@@ -1,7 +1,7 @@
 
 import classnames from "classnames/bind"
 import styles from "./listing.scss"
-import { useState, memo } from "react"
+import { useState, memo, useMemo } from "react"
 import Paper from '@material-ui/core/Paper'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -10,6 +10,8 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TablePagination from '@material-ui/core/TablePagination'
 import TableRow from '@material-ui/core/TableRow'
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp'
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 
 const cx = classnames.bind(styles)
 
@@ -21,6 +23,19 @@ const Listing = (props) => {
 
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [sortColumn, setSortColumn] = useState("")
+    const [sortDirection, setSortDirection] = useState("ASC")
+
+    const sortedRows = useMemo(() => {
+        console.log("memo", sortColumn, sortDirection)
+        if (sortColumn === "") {
+            return rows
+        } 
+        return [...rows].sort((a, b) => {
+            return (sortDirection === "ASC" && a[sortColumn] > b[sortColumn]) ||
+            (sortDirection === "DESC" && b[sortColumn] >= a[sortColumn]) ? 1 : -1
+        })
+    }, [sortColumn, sortDirection, rows])
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -29,6 +44,14 @@ const Listing = (props) => {
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
         setPage(0);
+    }
+
+    const changeSorting = (column) => {
+        if (column.id === sortColumn) {
+            setSortDirection(sortDirection === "ASC" ? "DESC" : "ASC")
+        } else {
+            setSortColumn(column.id)
+        }
     }
 
     const renderCell = (value, column) => {
@@ -57,19 +80,37 @@ const Listing = (props) => {
                     <TableHead>
                     <TableRow>
                         {columns.map((column) => (
-                        <TableCell
-                            key={column.id}
-                            data-testid={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                        >
-                            {column.label}
-                        </TableCell>
+                            column.sortable ? 
+                            <TableCell
+                                key={column.id}
+                                data-testid={column.id}
+                                align={column.align}
+                                style={{ minWidth: column.minWidth }}
+                                onClick={() => changeSorting(column)}
+                            >
+                                {column.label} 
+                                {
+                                    sortColumn === column.id && sortDirection === "ASC" &&
+                                        <ArrowDropUpIcon className={cx("table-icon")} fontSize="small" />
+                                }
+                                {
+                                    sortColumn === column.id && sortDirection === "DESC" &&
+                                        <ArrowDropDownIcon className={cx("table-icon")} fontSize="small" />
+                                }
+                            </TableCell> :
+                            <TableCell
+                                key={column.id}
+                                data-testid={column.id}
+                                align={column.align}
+                                style={{ minWidth: column.minWidth }}
+                            >
+                                {column.label}
+                            </TableCell> 
                         ))}
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    {sortedRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                         return (
                             <TableRow hover role="checkbox" tabIndex={-1} key={row.name}>
                                 {columns.map((column) => {

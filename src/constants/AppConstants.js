@@ -15,17 +15,20 @@ export const listColumns = [{
     id: "name",
     label: "Name",
     align: "left",
-    minWidth: 100
+    minWidth: 120,
+    sortable: true
 }, {
     id: "country",
     label: "Country",
     align: "left",
-    minWidth: 100
+    minWidth: 120,
+    sortable: true
 }, {
     id: "web_pages",
     label: "Websites",
     align: "left",
-    minWidth: 100
+    minWidth: 120,
+    sortable: false
 }]
 
 export const searchFilterOptions = [{
